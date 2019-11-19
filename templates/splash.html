@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}PA Legislation Tracker{% endblock %}
+{% block content %}
+
+<div class="splash" style="padding-bottom:50px;">
+
+  <div class="splash-image">
+    <img alt="Capitol Building" class="splash" draggable="false" src="{{url_for('static', filename='capitol.jpg')}}"/>
+    <div class="splash-image-text">
+      <h1 class="splash splash-image">Pennsylvania Legislation Tracker</h1>
+    </div>
+    <h2 class="splash-info">Welcome to Pennsylvania Legislation Tracker, the first ever independent, nonpartisan resource on legislators, legislation, and happenings in the Pennsylvania General Assembly.<br>Developed by Zachary Goldberg.</h2>
+  </div>
+
+  <div class="splash-parallel-divs">
+
+    <div class="splash-info">
+      <div style="display:auto;">
+
+      <div class="splash-featured-reps">
+        <h3 id="featured-legislator" style="padding-top:110px;margin-top:-110px;" class="splash">Featured Legislator</h3>
+      {% for rep in legislators %}
+      <a
+      {% if chamber == 'house' %}
+      href="/house/{{rep.dist}}"
+      {% else %}
+      href="/senate/{{rep.dist}}"
+      {% endif %}>
+      <div class="directory-box">
+
+        <div class="directory-photo">
+          {% if chamber == 'house' %}
+          <img id="directoryimg" class="directory-photo" alt="photo" src="{{ url_for('static', filename="r"+rep.dist|string()+".jpg") }}" />
+          {% else %}
+          <img id="directoryimg" class="directory-photo" alt="photo" src="{{ url_for('static', filename="s"+rep.dist|string()+".jpg") }}" />
+          {% endif %}
+        </div>
+
+        <div class="directory-info">
+          <ul class="directory-info">
+            <li><h5 class="directory-info">{{rep.first_name[0]}}. {{rep.last_name}} ({{rep.party}})</h5></li>
+            <li><p class="directory-info">District {{rep.dist}}</p></li>
+            <li><p class="directory-info">
+              {% if chamber == 'house' %}
+              Representative
+              {% else %}
+              Senator
+              {% endif %}
+            </p></li>
+            <li><p class="directory-info">
+              {% for county in rep.counties.split('%')%}
+                {% if county == rep.counties.split('%')[-1] %}
+                  {{county}}
+                {% else %}
+                  {{county}},
+                {% endif %}
+              {% endfor %}
+            </p></li>
+          </ul>
+        </div>
+      </div>
+      </a>
+      {% endfor %}
+      </div>
+
+
+      </div>
+
+    </div>
+
+    <div class="splash-bills" style="padding-bottom:60px;">
+      <div style="display:auto; margin-top:16px;">
+      <h3 style="padding-top:110px;margin-top:-110px;" id="featured-legislation" class="splash">Recent Legislation</h3>
+      {% for bill in bills %}
+        <div class="splash-bill-box">
+          {% if bill.title != None %}
+          <a href=/legislation/{{bill_from}}#{{bill.search_id}}><h1 class="bill-info">{{bill.title}}</h1></a>
+          {% endif %}
+          {% if bill.summary != None %}
+          <h2 class="bill-info">{{bill.summary}}</h2>
+          {% endif %}
+          {% if bill.primesponsor != None %}
+          <h2 class="bill-info">Prime sponsor: <a href="/{{bill_from}}/{{bill.primesponsor.split('*')[1]}}">{{bill.primesponsor.split('*')[0]}}</a></h2>
+          {% endif %}
+          <table class="legislation-progress">
+            <tr class="legislation-progress">
+              <th class="legislation-progress">Passed House</th>
+              <th class="legislation-progress">Passed Senate</th>
+              <th class="legislation-progress">Enacted</th>
+            </tr>
+            <tr class="legislation-progress">
+              {% if bill.passedhouse == "YES" %}
+              <td class="legislation-progress" style="background-color: #68f296; font-weight: bold;">✓</td>
+              {% else %}
+              <td class="legislation-progress" style="background-color: red; font-weight: bold;">✕</td>
+              {% endif %}
+
+              {% if bill.passedsenate == "YES" %}
+              <td class="legislation-progress" style="background-color: #68f296; font-weight: bold;">✓</td>
+              {% else %}
+              <td class="legislation-progress" style="background-color: red; font-weight: bold;">✕</td>
+              {% endif %}
+
+              {% if bill.enacted == "YES" %}
+              <td class="legislation-progress" style="background-color: #68f296; font-weight: bold;">✓</td>
+              {% else %}
+              <td class="legislation-progress" style="background-color: red; font-weight: bold;">✕</td>
+              {% endif %}
+            </tr>
+          </table>
+
+          {% if bill.committees != None %}
+          <h2 class="bill-info">Committee assignment: {{bill.committees.title()}}</h2>
+          {% endif %}
+          <h2 class="bill-link"><a target="_blank" href={{bill.link}}>View complete legislation</a></h2>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+
+</div>
+<div style="height:700px;"></div>
+
+{% endblock %}

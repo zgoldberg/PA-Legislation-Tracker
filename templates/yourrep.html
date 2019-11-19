@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Find Your Legislators{% endblock %}
+{% block content %}
+
+{% if foundreps != False %}
+<div class="body">
+  <h1 class="directory-container">Your legislators are...</h1>
+  <div class="directory-container">
+    <a href="/senate/{{sen.dist}}/">
+    <div class="directory-box">
+
+      <div class="directory-photo">
+        <img id="directoryimg" class="directory-photo" alt="photo" src="{{ url_for('static', filename="s"+sen.dist|string()+".jpg") }}" />
+      </div>
+
+      <div class="directory-info">
+        <ul class="directory-info">
+          <li><h5 class="directory-info">{{sen.first_name[0]}}. {{sen.last_name}} ({{sen.party}})</h5></li>
+          <li><p class="directory-info">District {{sen.dist}}</p></li>
+          <li><p class="directory-info">Senator</p></li>
+          <li><p class="directory-info">
+            {% for county in sen.counties.split('%')%}
+              {% if county == sen.counties.split('%')[-1] %}
+                {{county}}
+              {% else %}
+                {{county}},
+              {% endif %}
+            {% endfor %}
+          </p></li>
+        </ul>
+      </div>
+    </div>
+    </a>
+
+    <a href="/house/{{rep.dist}}/">
+    <div class="directory-box">
+
+      <div class="directory-photo">
+        <img id="directoryimg" class="directory-photo" alt="photo" src="{{ url_for('static', filename="r"+rep.dist|string()+".jpg") }}" />
+      </div>
+
+      <div class="directory-info">
+        <ul class="directory-info">
+          <li><h5 class="directory-info">{{rep.first_name[0]}}. {{rep.last_name}} ({{rep.party}})</h5></li>
+          <li><p class="directory-info">District {{rep.dist}}</p></li>
+          <li><p class="directory-info">Representative</p></li>
+          <li><p class="directory-info">
+            {% for county in rep.counties.split('%')%}
+              {% if county == rep.counties.split('%')[-1] %}
+                {{county}}
+              {% else %}
+                {{county}},
+              {% endif %}
+            {% endfor %}
+          </p></li>
+        </ul>
+      </div>
+    </div>
+    </a>
+
+  </div>
+  <div style="height:465px;"></div>
+</div>
+
+{% else %}
+<div class="body">
+  <div class="directory-container">
+    <h1 class="directory container" style="margin-top:100px;">There seems to have been a problem locating your legislators</h1>
+    <h2 class="directory-container">Please try again later or use the <a target="_blank" href="http://www.legis.state.pa.us/cfdocs/legis/home/findyourlegislator/">official Pennsylvania General Assembly website</a> to locate your legislators</h2>
+  </div>
+  <div class="error">
+    <img class="error" src="/static/logo.png">
+  </div>
+</div>
+<div style="height:765px;"></div>
+{% endif %}
+{% endblock %}

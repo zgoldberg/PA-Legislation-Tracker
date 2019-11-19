@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{page.title()}}{% endblock %}
+{% block content %}
+
+<div class="body">
+
+  <h2 class="wiki-header">{{page.title().replace('-',' ')}}</h2>
+
+  {% for i in range(100) %}
+  <br>
+  {% endfor %}
+
+  {% for term in terms['LIST_OF_TERMS'] %}
+  <dl class="wiki">
+    <dt>
+      <h1 class="wiki-term">{{term}}<a id={{term.replace(' ','-')}} class="wiki-jumptarget"><a href=#{{term.replace(' ','-')}}> ¶</a></a></h1>
+    </dt>
+    <dd><p class="wiki-def">{{terms[term]}}</p></dd>
+  </dl>
+  {% endfor %}
+
+  {% for i in range(100) %}
+  <br>
+  {% endfor %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Find your legislators{% endblock %}
+{% block content %}
+
+<div class="body">
+  <h1 class="find-rep">Find your legislators</h1>
+
+  <div class="find-rep-form">
+    <h2 class="find-rep-form">Enter your address to find your legislators:</h2>
+    <form action = "/find-legislators/" method = 'POST'>
+      <label for="streetaddress">Street Address:</label>
+      <input class="find-rep-form" type='text' size='60' name='streetaddress' >
+      <br><br>
+
+      <label for="city">County:</label>
+      <input class="find-rep-form" type='text' size='60' name='city'>
+      <br><br>
+
+      <label for="state">State:</label>
+      <input class="find-rep-form" type='text' value='Pennsylvania' size='60' name='state' readonly>
+      <br><br>
+
+      <label for="zipcode">Zip Code:</label>
+      <input class="find-rep-form" type='text' size='60' name='zipcode'>
+      <br><br>
+
+      <input class="find-rep-form" type='submit' value='Find'>
+    </form>
+  </div>
+
+  <div class="about-logo">
+    <img alt="Logo" class="about-logo" src="/static/logo.png"/>
+  </div>
+
+  <div style="height:600px;"></div>
+
+</div>
+{% endblock %}

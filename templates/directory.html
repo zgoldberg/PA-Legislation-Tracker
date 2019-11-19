@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}
+  {% if chamber == "rep" %}
+    House of Representatives
+  {% else %}
+    State Senate
+  {% endif %}
+
+{% if is_search == True %}
+  - {{search}}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="body">
+    <h1 class="directory-container">
+    {% if chamber == "rep" %}
+    The Pennsylvania House of Representatives
+    {% else %}
+    The Pennsylvania State Senate
+    {% endif %}</h1>
+
+    <div class="directory-search">
+      <form method="POST">
+        <input class="directory-search" type="text" name="search_reps"
+        {% if chamber == 'sen' %}
+        placeholder="Search the PA State Senate by name, district, or county"
+        {% else %}
+        placeholder="Search the PA House of Representatives by name, district, or county"
+        {% endif %}
+        autocomplete="off"/>
+        <input class="directory-search" type='submit' value='Search'>
+      </form>
+    </div>
+
+    <div class="directory-container">
+      {% if is_search == True %}
+        {% if reps|length() == 0 %}
+          <h2 class="directory-looking-for">We're sorry, we couldn't satisfy your search...</h2>
+        {% else %}
+          <h2 class="directory-looking-for">Were you looking for...</h2>
+        {% endif %}
+      {% endif %}
+      {% for rep in reps %}
+      <a
+      {% if chamber == "rep" %}
+      href="/house/{{rep.dist}}/"
+      {% else %}
+      href="/senate/{{rep.dist}}/"
+      {% endif %} class="directory-box">
+      <div class="directory-box">
+
+        <div class="directory-photo">
+          {% if chamber == "rep" %}
+          <img id="directoryimg" class="directory-photo" alt="photo" src="{{ url_for('static', filename="r"+rep.dist|string()+".jpg") }}" />
+          {% else %}
+          <img id="directoryimg" class="directory-photo" alt="photo" src="{{ url_for('static', filename="s"+rep.dist|string()+".jpg") }}" />
+          {% endif %}
+        </div>
+
+        <div class="directory-info">
+          <ul class="directory-info">
+            <li><h5 class="directory-info">{{rep.first_name[0]}}. {{rep.last_name}} ({{rep.party}})</h5></li>
+            <li><p class="directory-info">District {{rep.dist}}</p></li>
+            <li><p class="directory-info">
+              {% for county in rep.counties.split('%')%}
+                {% if county == rep.counties.split('%')[-1] %}
+                  {{county}}
+                {% else %}
+                  {{county}},
+                {% endif %}
+              {% endfor %}
+            </p></li>
+          </ul>
+        </div>
+      </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  <div style="height:585px;"></div>
+
+
+{% endblock %}

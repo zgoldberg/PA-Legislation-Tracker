@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+{% block title %}
+{% if elected_position == 'representative' %}
+  Rep.
+{% elif elected_position == 'senator' %}
+  Sen.
+{% endif %}
+{{rep.first_name}} {{rep.last_name}} ({{rep.party}})
+{% endblock %}
+
+{% block content %}
+  <div class="body">
+    <div class="profile-box">
+      <div class="profile">
+        {% if elected_position == 'senator' %}
+        <img alt="{{rep.last_name}}" class="face" src="{{ url_for('static', filename="s"+rep.dist|string()+".jpg") }}" />
+        {% else %}
+        <img alt="{{rep.last_name}}" class="face" src="{{ url_for('static', filename="r"+rep.dist|string()+".jpg") }}" />
+        {% endif %}
+      </div>
+
+      <div class="rep-info">
+        <ul class="rep-info-list rep-template">
+          <li><h1 class="bio">
+          {% if elected_position == 'senator' %}
+            Sen.
+          {% else %}
+            Rep.
+          {% endif %}
+          {{rep.first_name}} {{rep.last_name}} ({{rep.party}})</h1></li>
+          <li><p class="bio rep-template">Representing district {{rep.dist}} of Pennsylvania
+          {% if rep_since|length < 2 %}
+            since {{rep_since[0]}}
+          {% else %}
+            from
+            {% for i in rep_since %}
+              {% if i != rep_since[-1] %}
+                {{i}}
+                {% if i != rep_since[-2] and i != rep_since[-1] %}
+                  ,
+                {% endif %}
+              {% else %}
+                and {{i}}-present
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+          </p></li>
+          <li><p class="bio rep-template">
+            {% if elected_position == 'senator' %}
+              Term expires: {{rep.term_expires}}
+            {% elif elected_position == 'representative' %}
+              Term expires: 2018
+            {% endif %}
+          </p></li>
+          <li><p class="bio rep-template">
+            {% for county in counties %}
+              {% if (county != counties[-1]) %}
+                {{county}},
+              {% else %}
+                {{county}}
+              {% endif %}
+            {% endfor %}</p></li>
+          <li>
+              {% if rep.pers_site != None %}
+              <a href={{rep.pers_site}} target="_blank"><img class="media" src="/static/website.png"></a>
+              {% endif %}
+
+              {% if rep.facebook != None %}
+              <a href={{rep.facebook}} target="_blank"><img class="media" src="/static/facebook.png"></a>
+              {% endif %}
+
+              {% if rep.twitter != None %}
+              <a href={{rep.twitter}} target="_blank"><img class="media" src="/static/twitter.png"></a>
+              {% endif %}
+
+              {% if rep.youtube != None %}
+              <a href={{rep.youtube}} target="_blank"><img class="media" src="/static/youtube.png"></a>
+              {% endif %}
+
+              {% if rep.instagram != None %}
+              <a href={{rep.instagram}} target="_blank"><img class="media" src="/static/instagram.png"></a>
+              {% endif %}
+
+              {% if rep.google_plus != None %}
+              <a href={{rep.google_plus}} target="_blank"><img class="media" src="/static/google_plus.png"></a>
+              {% endif %}
+
+              {% if rep.linkedin != None %}
+              <a href={{rep.linkedin}} target="_blank"><img class="media" src="/static/linkedin.png"></a>
+              {% endif %}
+          </li>
+        </ul>
+      </div>
+
+      <div class="committees">
+        <h3 class="committees-heading rep-template">Committee Assignments / Leadership</h3>
+        <ul class="committees-list rep-template">
+          {% for i in committees_leadership %}
+            <li><p class="rep-template">{{i}}</p></li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="all-offices">
+
+        <div class="office">
+          <ul class="office-list rep-template">
+            <li><a target="_blank" href={{officeGoogleMaps(dist_address[0])}}><h3 class="rep-template">Primary Office</h3></a></li>
+            <li><a target="_blank" href={{officeGoogleMaps(dist_address[0])}}><h2 class="rep-template">{{dist_address[0]}}</h2></a></li>
+            {% if dist_phone[0] != None %}
+            <li><p class="rep-template">Phone: {{dist_phone[0]}}</p></li>
+            {% endif %}
+
+            {% if dist_fax[0] != None %}
+            <li><p class="rep-template">Fax: {{dist_fax[0]}}</p></li>
+            {% endif %}
+          </ul>
+        </div>
+
+        {% if dist_address|length > 1 %}
+        {% for office_address in dist_address[1:] %}
+
+        <div class="office">
+          <ul class="office-list rep-template">
+            <li><a target="_blank" href={{officeGoogleMaps(office_address)}}><h3 class="rep-template">Other Office</h3></a></li>
+            <li><a target="_blank" href={{officeGoogleMaps(office_address)}}><h2 class="rep-template">{{office_address}}</h2></a></li>
+
+            {% if dist_phone[dist_address.index(office_address)] != None %}
+            <li><p class="rep-template">Phone:
+              {{dist_phone[dist_address.index(office_address)]}}
+            {% endif %}</p></li>
+
+            {% if dist_fax[dist_address.index(office_address)] != None %}
+            <li><p class="rep-template">Fax:
+              {{dist_fax[dist_address.index(office_address)]}}
+            {% endif %}</p></li>
+          </ul>
+        </div>
+
+        {% endfor %}
+        {% endif %}
+
+        <div class="office">
+          <ul class="office-list rep-template">
+            <li><a target="_blank" href={{officeGoogleMaps('Pennsylvania State Capitol Complex')}}><h3 class="rep-template">Capitol Office</h3></a></li>
+            <li><a target="_blank" href={{officeGoogleMaps('Pennsylvania State Capitol Complex')}}><h2 class="rep-template">{{rep.cap_address}}</h2></a></li>
+            {% if rep.cap_phone != None %}
+            <li><p class="rep-template">Phone:
+              {{rep.cap_phone}}
+            {% endif %}</p></li>
+
+            {% if rep.cap_fax != None %}
+            <li><p class="rep-template">Fax:
+              {{rep.cap_fax}}
+            {% endif %}</p></li>
+          </ul>
+        </div>
+    </div>
+      {% if sponsored_bills|length() != 0 and cosponsored_bills|length != 0 %}
+      <h4 class="rep-template">For a more detailed biography of this {{elected_position}}, visit his/her <a class="gov_bio-link" target="_blank" href="{{rep.gov_bio}}">official government site</a>. &emsp; View this {{elected_position}}'s <a class="gov_bio-link" href=#sponsored>sponsored legislation</a> or <a class="gov_bio-link" href=#cosponsored>co-sponsored legislation</a>.</h4>
+      {% elif sponsored_bills|length() != 0 and cosponsored_bills|length == 0 %}
+      <h4 class="rep-template">For a more detailed biography of this {{elected_position}}, visit his/her <a class="gov_bio-link" target="_blank" href="{{rep.gov_bio}}">official government site</a>. &emsp; View this {{elected_position}}'s <a class="gov_bio-link" href=#sponsored>sponsored legislation</a>.</h4>
+      {% elif sponsored_bills|length() == 0 and cosponsored_bills|length != 0 %}
+      <h4 class="rep-template">For a more detailed biography of this {{elected_position}}, visit his/her <a class="gov_bio-link" target="_blank" href="{{rep.gov_bio}}">official government site</a>. &emsp; View this {{elected_position}}'s <a class="gov_bio-link" href=#cosponsored>co-sponsored legislation</a>.</h4>
+      {% elif sponsored_bills|length() == 0 and cosponsored_bills|length == 0 %}
+      <h4 class="rep-template">For a more detailed biography of this {{elected_position}}, visit his/her <a class="gov_bio-link" target="_blank" href="{{rep.gov_bio}}">official government site</a>.</h4>
+      {% endif %}
+    </div>
+
+ <!-- ########################################################################################################################################## -->
+
+    {% if sponsored_bills|length() != 0 %}
+    <div class="legislation-container sponsor">
+      <h2 class="legislation-looking-for" style="margin-top:70px;"><a id="sponsored"><a style="padding-top:90px;">Legislation sponsored by
+        {% if elected_position == 'representative' %}
+          Rep.
+        {% elif elected_position == 'senator' %}
+          Sen.
+        {% endif %}
+        {{rep.first_name}} {{rep.last_name}}</a></a></h2>
+      {% for bill in sponsored_bills %}
+      <div class="bill-box">
+        {% if bill.title != None %}
+        <h1 class="bill-info">{{bill.title}}<a id={{bill.search_id}} class="legislation-jumptarget"><a class="legislation-paragraph"href=#{{bill.search_id}} > ¶</a></a></h1>
+        {% endif %}
+        {% if bill.summary != None %}
+        <h2 class="bill-info">{{bill.summary}}</h2>
+        {% endif %}
+        {% if bill.primesponsor != None %}
+        <h2 class="bill-info">Prime sponsor: <a href="/{{chamber}}/{{bill.primesponsor.split('*')[1]}}/">{{bill.primesponsor.split('*')[0]}}</a></h2>
+        {% endif %}
+        {% if bill.cosponsors != None %}
+        <h2 class="bill-info">Co-sponsors:
+          {% for cosponsor in bill.cosponsors.split('%')%}
+            {% if cosponsor == bill.cosponsors.split('%')[-1] %}
+              and <a href="/{{chamber}}/{{cosponsor.split('*')[1]}}/">{{cosponsor.split('*')[0]}}</a>
+            {% else %}
+              <a href="/{{chamber}}/{{cosponsor.split('*')[1]}}/">{{cosponsor.split('*')[0]}}</a>,
+            {% endif %}
+          {% endfor %}
+        </h2>
+        {% endif %}
+        <table class="legislation-progress">
+          <tr class="legislation-progress">
+            <th class="legislation-progress">Passed House</th>
+            <th class="legislation-progress">Passed Senate</th>
+            <th class="legislation-progress">Enacted</th>
+          </tr>
+          <tr class="legislation-progress">
+            {% if bill.passedhouse == "YES" %}
+            <td class="legislation-progress" style="background-color: #68f296; font-weight: bold;">✓</td>
+            {% else %}
+            <td class="legislation-progress" style="background-color: red; font-weight: bold;">✕</td>
+            {% endif %}
+
+            {% if bill.passedsenate == "YES" %}
+            <td class="legislation-progress" style="background-color: #68f296; font-weight: bold;">✓</td>
+            {% else %}
+            <td class="legislation-progress" style="background-color: red; font-weight: bold;">✕</td>
+            {% endif %}
+
+            {% if bill.enacted == "YES" %}
+            <td class="legislation-progress" style="background-color: #68f296; font-weight: bold;">✓</td>
+            {% else %}
+            <td class="legislation-progress" style="background-color: red; font-weight: bold;">✕</td>
+            {% endif %}
+          </tr>
+        </table>
+
+        {% if bill.committees != None %}
+        <h2 class="bill-info">Committee assignment: {{bill.committees.title()}}</h2>
+        {% endif %}
+
+        {% if show_published == True and bill.published != None %}
+        <h2 class="bill-info">Record published: {{bill.published[5:7]}}-{{bill.published[8:]}}-{{bill.published[:4]}}</h2>
+        {% endif %}
+        {% if bill.link != None %}
+        <h2 class="bill-link"><a target="_blank" href={{bill.link}}>View complete legislation</a></h2>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if cosponsored_bills|length() != 0 %}
+    <div class="legislation-container cosponsor">
+      <h2 class="legislation-looking-for" style="margin-top:70px;"><a id="cosponsored"><a style="padding-top:90px;">Legislation co-sponsored by
+        {% if elected_position == 'representative' %}
+          Rep.
+        {% elif elected_position == 'senator' %}
+          Sen.
+        {% endif %}
+        {{rep.first_name}} {{rep.last_name}}</a></a></h2>
+
+      {% for bill in cosponsored_bills %}
+      <div class="bill-box">
+        {% if bill.title != None %}
+        <h1 class="bill-info">{{bill.title}}<a id={{bill.search_id}} class="legislation-jumptarget"><a class="legislation-paragraph" href=#{{bill.search_id}} > ¶</a></a></h1>
+        {% endif %}
+        {% if bill.summary != None %}
+        <h2 class="bill-info">{{bill.summary}}</h2>
+        {% endif %}
+        {% if bill.primesponsor != None %}
+        <h2 class="bill-info">Prime sponsor: <a href="/{{chamber}}/{{bill.primesponsor.split('*')[1]}}/">{{bill.primesponsor.split('*')[0]}}</a></h2>
+        {% endif %}
+        {% if bill.cosponsors != None %}
+        <h2 class="bill-info">Co-sponsors:
+          {% for cosponsor in bill.cosponsors.split('%')%}
+            {% if cosponsor == bill.cosponsors.split('%')[-1] %}
+              and <a href="/{{chamber}}/{{cosponsor.split('*')[1]}}/">{{cosponsor.split('*')[0]}}</a>
+            {% else %}
+              <a href="/{{chamber}}/{{cosponsor.split('*')[1]}}/">{{cosponsor.split('*')[0]}}</a>,
+            {% endif %}
+          {% endfor %}
+        </h2>
+        {% endif %}
+        <table class="legislation-progress">
+          <tr class="legislation-progress">
+            <th class="legislation-progress">Passed House</th>
+            <th class="legislation-progress">Passed Senate</th>
+            <th class="legislation-progress">Enacted</th>
+          </tr>
+          <tr class="legislation-progress">
+            {% if bill.passedhouse == "YES" %}
+            <td class="legislation-progress" style="background-color: green; font-weight: bold;">✓</td>
+            {% else %}
+            <td class="legislation-progress" style="background-color: red; font-weight: bold;">✕</td>
+            {% endif %}
+
+            {% if bill.passedsenate == "YES" %}
+            <td class="legislation-progress" style="background-color: green; font-weight: bold;">✓</td>
+            {% else %}
+            <td class="legislation-progress" style="background-color: red; font-weight: bold;">✕</td>
+            {% endif %}
+
+            {% if bill.enacted == "YES" %}
+            <td class="legislation-progress" style="background-color: green; font-weight: bold;">✓</td>
+            {% else %}
+            <td class="legislation-progress" style="background-color: red; font-weight: bold;">✕</td>
+            {% endif %}
+          </tr>
+        </table>
+
+        {% if bill.committees != None %}
+        <h2 class="bill-info">Committee assignment: {{bill.committees.title()}}</h2>
+        {% endif %}
+
+        {% if show_published == True and bill.published != None %}
+        <h2 class="bill-info">Record published: {{bill.published[5:7]}}-{{bill.published[8:]}}-{{bill.published[:4]}}</h2>
+        {% endif %}
+
+        {% if bill.ling != None %}
+        <h2 class="bill-link"><a target="_blank" href={{bill.link}}>View complete legislation</a></h2>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+  <div style="height:414px;"></div>
+
+{% endblock %}

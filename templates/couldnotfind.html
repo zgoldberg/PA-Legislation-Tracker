@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {% if error_type == '404' %}
+    Page not found
+  {% else %}
+    Internal Service Error
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="body">
+
+  {% if error_type == '404' %}
+  <h1 class="error">Page not found</h1>
+  {% else %}
+  <h1 class="error">There seems to have been a problem with our server</h1>
+  {% endif %}
+
+    <div class="error">
+      <img class="error" src="/static/logo.png">
+    </div>
+
+  {% if error_type == '404' %}
+  <h2 class="error">This page may have been deleted, or the link you followed may be broken</h2>
+  {% else %}
+  <h2 class="error">Please try again later</h2>
+  {% endif %}
+
+</div>
+<div style="height:585px;"></div>
+{% endblock %}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    {% block head %}
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
+    <link rel="stylesheet" type="text/css" href= "{{ url_for('static', filename='basestyle.css') }}"/>
+
+    <meta charset="utf-8"/>
+    <meta http-equiv="Content-Language" content="en"/>
+    <meta name="keywords" content="Pennsylvania,PA,Politics,House,Senate,General Assembly,Legislation,Legislators,Bill,Resolution"/>
+    <meta name="author" content="Zachary Goldberg"/>
+    <meta name="description" content="The first ever independent, nonpartisan resource on legislators, legislation, and happenings in the Pennsylvania General Assembly."/>
+    <meta name="google-site-verification" content="q4QxJYvNtK9DhFS_tKKPvJLw-tj3xuzPRfX7yTs66mQ"/>
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css?family=Space+Mono" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700" rel="stylesheet"/>
+    {% endblock %}
+  </head>
+
+  <body>
+    <div class="nav">
+      <a href="/"><img class="logo" src="/static/logo.png"></a>
+
+      <div class="nav-item">
+        <a href="/about/">
+          <button class="nav-button">About</button>
+        </a>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-button">Legislators</button>
+        <div class="nav-item-content">
+          <a href="/house/">Members of the House of Representatives</a>
+          <a href="/senate/">Members of the Senate</a>
+          <!-- <a href="/find-legislators/">Locate your Legislators</a> -->
+          <a target="_blank" href="http://www.legis.state.pa.us/cfdocs/legis/home/findyourlegislator/">Locate your Legislators</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-button">Legislation</button>
+        <div class="nav-item-content">
+          <a href="/legislation/house/">House of Representatives</a>
+          <a href="/legislation/senate/">Senate</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="warning">
+      <h1 class=warning>Pennsylvania Legislation Tracker has not been updated since August 15, 2018</h1>
+    </div>
+
+    <div class="padding-div"></div>
+
+    {% block content %}{% endblock %}
+
+    <div id="footer">
+      <h1 id="footer-h1">Pennsylvania Legislation Tracker 2018&emsp;|&emsp;Zachary Goldberg</h1>
+    </div>
+
+    <script src="https://fb.me/react-15.0.0.js"></script>
+    <script src="https://fb.me/react-dom-15.0.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+
+
+  </body>
+</html>

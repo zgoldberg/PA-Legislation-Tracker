@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}{{chamber.title()}} Legislation
+
+{% if is_search == True %}
+  {% if category in ["passed-house","passed-senate","enacted"] %}
+    {% if category == "passed-house" %}
+      - Passed House
+    {% elif category == "passed-senate" %}
+      - Passed Senate
+    {% else %}
+      - Enacted
+    {% endif %}
+  {% else %}
+  - {{search}}
+  {% endif %}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="body">
+  {% if chamber == 'house' %}
+  <h4 class="bill-header">The Pennsylvania House of Representatives</h4>
+  {% else %}
+  <h4 class="bill-header">The Pennsylvania State Senate</h4>
+  {% endif %}
+  <h3 class="bill-header">Bills and Resolutions from the 2017-2018 Regular Session</h3>
+
+  <div class="legislation-search">
+    <form method="POST" id="search-form">
+      <input class="legislation-search" type="text" name="search_legislation"
+      {% if chamber == 'senate' %}
+      placeholder="Search legislation from the PA State Senate"
+      {% else %}
+      placeholder="Search legislation from the PA House of Representatives"
+      {% endif %}
+      autocomplete="off"/>
+      <select class="legislation-search" name="search-by" form="search-form">
+        <option value="null">Search by...</option>
+        <option value="id">Bill ID</option>
+        <option value="primesponsor">Prime Sponsor</option>
+        <option value="cosponsor">Co-sponsor</option>
+        <option value="date">Date (mm/dd/yyyy)</option>
+        <option value="keyword">Keyword</option>
+        <option value="committee">Committee</option>
+        <option value="passed-house">Passed House</option>
+        <option value="passed-senate">Passed Senate</option>
+        <option value="enacted">Enacted</option>
+      </select>
+      <input class="legislation-search" type='submit' value='Search'>
+    </form>
+
+  </div>
+
+  <div class="legislation-container">
+  {% if is_search == True %}
+    {% if category == "null" %}
+      <h2 class="legislation-looking-for">No search category selected</h2>
+    {% elif category == "id"%}
+      {% if bills|length() != 0 %}
+        <h2 class="legislation-looking-for">We found 1 bill with an ID matching "{{search}}"</h2>
+      {% else %}
+        <h2 class="legislation-looking-for">We couldn't find a bill with an ID matching "{{search}}"</h2>
+      {% endif %}
+    {% elif category == "primesponsor" %}
+      {% if bills|length() != 0 %}
+        <h2 class="legislation-looking-for">We found {{(bills|length())}} bills with a prime sponsor matching "{{search}}"</h2>
+      {% else %}
+        <h2 class="legislation-looking-for">We couldn't find any bills with a prime sponsor matching "{{search}}"</h2>
+      {% endif %}
+    {% elif category == "cosponsor" %}
+      {% if bills|length() != 0 %}
+        <h2 class="legislation-looking-for">We found {{(bills|length())}} bills with a co-sponsor matching "{{search}}"</h2>
+      {% else %}
+        <h2 class="legislation-looking-for">We couldn't find any bills with a co-sponsor matching "{{search}}"</h2>
+      {% endif %}
+    {% elif category == "date" %}
+      {% if bills|length() != 0 %}
+        <h2 class="legislation-looking-for">We found {{(bills|length())}} bills published on {{search}}</h2>
+      {% else %}
+        <h2 class="legislation-looking-for">We couldn't find any bills published on "{{search}}"<br><br>Make sure your search matches the format mm/dd/yyyy</h2>
+      {% endif %}
+    {% elif category == "keyword" %}
+      {% if bills|length() != 0 %}
+        <h2 class="legislation-looking-for">We found {{(bills|length())}} bills containing the phrase "{{search}}"</h2>
+      {% else %}
+        <h2 class="legislation-looking-for">We couldn't find any bills bills containing the phrase "{{search}}"</h2>
+      {% endif %}
+    {% elif category == "committee" %}
+      {% if bills|length() != 0 %}
+        <h2 class="legislation-looking-for">We found {{(bills|length())}} bills refered to "{{search}}"</h2>
+      {% else %}
+        <h2 class="legislation-looking-for">We couldn't find any bills refered to "{{search}}"</h2>
+      {% endif %}
+
+    {% elif category == "passed-house" %}
+      {% if bills|length() != 0 %}
+        <h2 class="legislation-looking-for">We found {{(bills|length())}} bills from the {{chamber|title()}} that have recieved a majority vote in the House</h2>
+      {% else %}
+        <h2 class="legislation-looking-for">We couldn't find any bills from the {{chamber|title()}} that have recieved a majority vote in the House</h2>
+      {% endif %}
+    {% elif category == "passed-senate" %}
+      {% if bills|length() != 0 %}
+        <h2 class="legislation-looking-for">We found {{(bills|length())}} bills from the {{chamber|title()}} that have recieved a majority vote in the Senate</h2>
+      {% else %}
+        <h2 class="legislation-looking-for">We couldn't find any bills from the {{chamber|title()}} that have recieved a majority vote in the Senate</h2>
+      {% endif %}
+    {% elif category == "enacted" %}
+      {% if bills|length() != 0 %}
+        <h2 class="legislation-looking-for">We found {{(bills|length())}} bills from the {{chamber|title()}} that have been enacted</h2>
+      {% else %}
+        <h2 class="legislation-looking-for">We couldn't find any bills from the {{chamber|title()}} that have been enacted</h2>
+      {% endif %}
+
+
+    {% endif %}
+  {% endif %}
+
+  {% for bill in bills %}
+  <div class="bill-box">
+    {% if bill.title != None %}
+    <h1 class="bill-info">{{bill.title}}<a id={{bill.search_id}} class="legislation-jumptarget"><a class="legislation-paragraph"href=#{{bill.search_id}} > ¶</a></a></h1>
+    {% endif %}
+    {% if bill.summary != None %}
+    <h2 class="bill-info">{{bill.summary}}</h2>
+    {% endif %}
+    {% if bill.primesponsor != None %}
+    <h2 class="bill-info">Prime sponsor: <a href="/{{chamber}}/{{bill.primesponsor.split('*')[1]}}/">{{bill.primesponsor.split('*')[0]}}</a></h2>
+    {% endif %}
+    {% if bill.cosponsors != None %}
+    <h2 class="bill-info">Co-sponsors:
+      {% for cosponsor in bill.cosponsors.split('%')%}
+        {% if cosponsor == bill.cosponsors.split('%')[-1] %}
+          and <a href="/{{chamber}}/{{cosponsor.split('*')[1]}}/">{{cosponsor.split('*')[0]}}</a>
+        {% else %}
+          <a href="/{{chamber}}/{{cosponsor.split('*')[1]}}/">{{cosponsor.split('*')[0]}}</a>,
+        {% endif %}
+      {% endfor %}
+    </h2>
+    {% endif %}
+    <table class="legislation-progress">
+      <tr class="legislation-progress">
+        <th class="legislation-progress">Passed House</th>
+        <th class="legislation-progress">Passed Senate</th>
+        <th class="legislation-progress">Enacted</th>
+      </tr>
+      <tr class="legislation-progress">
+        {% if bill.passedhouse == "YES" %}
+        <td class="legislation-progress" style="background-color: #68f296; font-weight: bold;">✓</td>
+        {% else %}
+        <td class="legislation-progress" style="background-color: red; font-weight: bold;">✕</td>
+        {% endif %}
+
+        {% if bill.passedsenate == "YES" %}
+        <td class="legislation-progress" style="background-color: #68f296; font-weight: bold;">✓</td>
+        {% else %}
+        <td class="legislation-progress" style="background-color: red; font-weight: bold;">✕</td>
+        {% endif %}
+
+        {% if bill.enacted == "YES" %}
+        <td class="legislation-progress" style="background-color: #68f296; font-weight: bold;">✓</td>
+        {% else %}
+        <td class="legislation-progress" style="background-color: red; font-weight: bold;">✕</td>
+        {% endif %}
+      </tr>
+    </table>
+
+    {% if bill.committees != None %}
+      <h2 class="bill-info">Committee assignment: {{bill.committees.title()}}</h2>
+    {% endif %}
+
+    {% if show_published == True %}
+    <h2 class="bill-info">Record published: {{bill.published[5:7]}}-{{bill.published[8:]}}-{{bill.published[:4]}}</h2>
+    {% endif %}
+
+    <h2 class="bill-link"><a target="_blank" href={{bill.link}}>View complete legislation</a></h2>
+  </div>
+  {% endfor %}
+
+  </div>
+</div>
+<div id="push-down"></div>
+{% endblock %}

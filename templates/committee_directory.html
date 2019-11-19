@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}
+  {% if chamber == "rep" %}
+    {{committee|title}} Committee | House of Representatives
+  {% else %}
+    {{committee}} | State Senate
+  {% endif %}
+
+{% endblock %}
+{% block content %}
+  <div class="body">
+    <h1 class="directory-container">
+    {% if chamber == "rep" %}
+    The Pennsylvania House of Representatives
+    {% else %}
+    The Pennsylvania State Senate
+    {% endif %}</h1>
+
+    {% if reps|length != 0 %}
+      <h3 style="text-align:center;font-size:30px;margin-bottom:18px;margin-top:32px;">Members of the {{committee|replace('-',' ')|title}} Committee</h3>
+    {% else %}
+      <h3 style="text-align:center;font-size:30px;margin-bottom:18px;margin-top:32px;">We couldn't find any members of the {{committee|replace('-',' ')|title}} Committee</h3>
+      <div class="error">
+        <img class="error" src="/static/logo.png">
+      </div>
+    {% endif %}
+
+
+    <div class="directory-container">
+      {% for rep in reps %}
+      <a
+      {% if chamber == "rep" %}
+      href="/house/{{rep.dist}}"
+      {% else %}
+      href="/senate/{{rep.dist}}"
+      {% endif %} class="directory-box">
+      <div class="directory-box">
+
+        <div class="directory-photo">
+          {% if chamber == "rep" %}
+          <img id="directoryimg" class="directory-photo" alt="photo" src="{{ url_for('static', filename="r"+rep.dist|string()+".jpg") }}" />
+          {% else %}
+          <img id="directoryimg" class="directory-photo" alt="photo" src="{{ url_for('static', filename="s"+rep.dist|string()+".jpg") }}" />
+          {% endif %}
+        </div>
+
+        <div class="directory-info">
+          <ul class="directory-info">
+            <li><h5 class="directory-info">{{rep.first_name[0]}}. {{rep.last_name}} ({{rep.party}})</h5></li>
+            <li><p class="directory-info">District {{rep.dist}}</p></li>
+            <li><p class="directory-info">
+              {% for county in rep.counties.split('%')%}
+                {% if county == rep.counties.split('%')[-1] %}
+                  {{county}}
+                {% else %}
+                  {{county}},
+                {% endif %}
+              {% endfor %}
+            </p></li>
+          </ul>
+        </div>
+      </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  <div style="height:585px;"></div>
+
+
+{% endblock %}
